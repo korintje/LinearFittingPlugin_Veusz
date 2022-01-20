@@ -40,6 +40,3 @@ class LinearFit(ToolsPlugin):
 
 # add the class to the registry.
 toolspluginregistry.append(LinearFit)
-
-
-
