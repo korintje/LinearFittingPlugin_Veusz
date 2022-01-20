@@ -27,15 +27,16 @@ class LinearFit(ToolsPlugin):
         """
         import numpy as np
 
-        xs = fields["ds_x"]
-        ys = fields["ds_y"]
+        xs = interface.GetData(fields["ds_x"])[0]
+        ys = interface.GetData(fields["ds_y"])[0]
         
         coefs = np.polynomial.polynomial.polyfit(xs, ys, 1, full=False)
         b = coefs[0]
         a = coefs[1]
-        added_name = interface.Add('function', name='fitline')
-        interface.Set(f'{added_name}/function', f'{a} * x + b')
-        fitline = interface.Get(added_name)
+        root = interface.Root
+        page = root.Add('page')
+        graph = page.Add('graph')
+        line = graph.Add('function', function=f'{a} * x + {b}')
 
 # add the class to the registry.
 toolspluginregistry.append(LinearFit)
