@@ -1,2 +1,2 @@
 # PolynomialFittingPlugin_Veusz
-Give simple linear-fit function
+Give simple polynomial fitting function
