@@ -1,42 +1,52 @@
 # -*- coding: utf-8 -*-
+# Written by Takuro Hosomi
+# The script license is copy-lefted from Veusz to be GPL v2.0
+
 from veusz.plugins import ToolsPlugin, toolspluginregistry
 
 class LinearFit(ToolsPlugin):
-    """A plugin to give simple linear fit line."""
-    menu = ('Linear fit',)
-    name = 'Linear fit'
-    description_short = 'Linear fit.'
+    """A plugin to do polynomial fit """
+    menu = ('Polynomial fit',)
+    name = 'Polynomial fit'
+    description_short = 'Do polynomial fit.'
     description_full = 'Press "Apply" to fit data.'
 
     def __init__(self):
-        from veusz.plugins import FieldDataset
+        from veusz.plugins import FieldDataset, FieldInt
         """Construct plugin."""
         self.fields = [
+            FieldInt(
+                'dim', descr='dimension',
+                default=1),
             FieldDataset(
-                'ds_x', descr="x dataset",
+                'xs_name', descr='x dataset',
                 default=''),
             FieldDataset(
-                'ds_y', descr="y dataset",
+                'ys_name', descr='y dataset',
                 default=''),
         ]
     
     def apply(self, interface, fields):
         """
-        Select and load image file from a dialog.
-        All widgets in the current window will be wiped.  
+        Function of fitting result will be added.  
         """
         import numpy as np
 
-        xs = interface.GetData(fields["ds_x"])[0]
-        ys = interface.GetData(fields["ds_y"])[0]
+        dim = fields['dim']
+        xs = interface.GetData(fields['xs_name'])[0]
+        ys = interface.GetData(fields['ys_name'])[0]
         
-        coefs = np.polynomial.polynomial.polyfit(xs, ys, 1, full=False)
-        b = coefs[0]
-        a = coefs[1]
+        coeffs = np.polynomial.polynomial.polyfit(xs, ys, dim, full=False)
+        expr = ''
+        for i, coeff in enumerate(coeffs):
+            if i == 0:
+                expr += f'{coeff}'
+            else:
+                expr += f' + {coeff} * x**{i}'
         root = interface.Root
         page = root.Add('page')
         graph = page.Add('graph')
-        line = graph.Add('function', function=f'{a} * x + {b}')
+        line = graph.Add('function', function=expr)
 
 # add the class to the registry.
 toolspluginregistry.append(LinearFit)
